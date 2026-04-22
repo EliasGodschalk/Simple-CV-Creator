@@ -34,12 +34,12 @@ export function PersonalDetailsForm() {
       description="Primary Contact Information" 
       icon={<User size={24} strokeWidth={2.5} />}
     >
-      <div className="flex flex-col md:flex-row gap-8 mb-8">
+      <div className="flex flex-col md:flex-row gap-12 mb-12">
         <div className="flex-shrink-0">
-          <label className="form-label mb-2 block text-center md:text-left">Profile Photo</label>
-          <div className="relative w-40 h-40 mx-auto md:mx-0">
+          <label className="form-label mb-4 block text-center md:text-left">Profile Photo</label>
+          <div className="relative w-44 h-44 mx-auto md:mx-0 p-3 bg-slate-950/30 border border-slate-800/50 rounded-[2rem] hover:border-cyan-500/20 transition-all group/photo">
             {personalDetails.photo ? (
-              <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-slate-200 group">
+              <div className="relative w-full h-full rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
                 <Image 
                   src={personalDetails.photo} 
                   alt="Profile" 
@@ -49,18 +49,18 @@ export function PersonalDetailsForm() {
                 />
                 <button
                   onClick={removeImage}
-                  className="absolute top-1 right-1 bg-white/90 p-1 rounded-full text-red-500 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
+                  className="absolute top-2 right-2 bg-slate-950/80 p-1.5 rounded-full text-rose-500 opacity-0 group-hover/photo:opacity-100 transition-opacity shadow-xl border border-rose-500/20 z-10 hover:bg-rose-500 hover:text-white"
                   title="Remove Photo"
                 >
                   <X size={14} strokeWidth={3} />
                 </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer hover:border-slate-300 transition-colors group">
-                <div className="p-3 rounded-full bg-slate-50 group-hover:bg-slate-100 transition-colors">
-                  <Camera size={24} className="text-slate-400 group-hover:text-slate-500" />
+              <label className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-slate-800 rounded-2xl cursor-pointer hover:border-cyan-500/50 hover:bg-cyan-500/5 transition-all group/upload">
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 group-hover/upload:border-cyan-500/50 group-hover/upload:text-cyan-400 transition-all shadow-xl">
+                  <Camera size={28} className="text-slate-500 group-hover/upload:text-cyan-400" />
                 </div>
-                <span className="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-400">Upload</span>
+                <span className="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover/upload:text-cyan-400">Upload</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -72,7 +72,7 @@ export function PersonalDetailsForm() {
           </div>
         </div>
 
-        <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
           <div className="space-y-2">
             <label className="form-label">Full Name</label>
             <div className="relative group">

@@ -31,19 +31,19 @@ export function SkillsForm() {
               value={newSkill}
               onChange={(e) => setNewSkill(e.target.value)}
               placeholder="Enter a skill (e.g. React, Python, Leadership)..."
-              className="form-input focus:border-emerald-500/50"
+              className="form-input"
             />
           </div>
           <button
             type="submit"
-            className="flex items-center gap-2 px-8 py-3.5 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-500 transition-all font-black text-[10px] uppercase tracking-widest shadow-[0_10px_20px_-5px_rgba(16,185,129,0.3)] active:scale-95 whitespace-nowrap border border-emerald-400/20"
+            className="flex items-center gap-2 px-8 py-3.5 bg-cyan-600 text-white rounded-2xl hover:bg-cyan-500 transition-all font-black text-[10px] uppercase tracking-widest shadow-[0_10px_20px_-5px_rgba(34,211,238,0.3)] active:scale-95 whitespace-nowrap border border-cyan-400/20"
           >
             <Plus size={18} strokeWidth={3} />
             ADD SKILL
           </button>
         </form>
 
-        <div className="flex flex-wrap gap-4 min-h-[80px] p-6 bg-slate-950/50 rounded-3xl border border-slate-900 shadow-inner">
+        <div className="flex flex-wrap gap-4 min-h-[80px] p-8 bg-slate-950/30 border border-slate-800/50 rounded-[2rem] shadow-inner">
           {skills.length === 0 && (
             <p className="text-[10px] text-slate-700 font-black uppercase tracking-[0.3em] flex items-center h-full w-full justify-center">
               No skills added yet.
@@ -52,7 +52,7 @@ export function SkillsForm() {
           {skills.map((skill) => (
             <span
               key={skill}
-              className="flex items-center gap-3 px-5 py-2.5 bg-slate-900 text-emerald-400 border border-emerald-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl animate-in zoom-in-95 duration-300"
+              className="flex items-center gap-3 px-5 py-2.5 bg-slate-900 text-cyan-400 border border-cyan-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl animate-in zoom-in-95 duration-300"
             >
               {skill}
               <button
