@@ -1,0 +1,16 @@
+description = "Review recent changes for errors, best practices, and potential bugs."
+prompt = """
+Review the following changes in the codebase for potential errors, logic issues, or deviations from best practices.
+
+Current git status:
+!{git status}
+
+Diff of changes:
+!{git diff HEAD}
+
+Please analyze the diff and report:
+1. Critical errors or bugs.
+2. Logic or performance issues.
+3. Code style or best practice recommendations.
+4. Suggestions for improvement.
+"""

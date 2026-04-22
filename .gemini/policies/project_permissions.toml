@@ -1,0 +1,27 @@
+description = "Auto-approve frequent tools and shell commands for this project."
+
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = ["npm", "git", "mkdir", "ls", "node", "npx"]
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "replace"
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "write_file"
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "save_memory"
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "read_file"
+decision = "allow"
+priority = 100

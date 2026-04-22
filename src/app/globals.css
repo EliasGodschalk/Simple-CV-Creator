@@ -1,26 +1,167 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+@theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #020617; /* Slate 950 */
+  --foreground: #f8fafc; /* Slate 50 */
+  --accent-cyan: #22d3ee;
+  --accent-pink: #f472b6;
+  --accent-blue: #3b82f6;
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--background);
+  font-family: var(--font-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Advanced Dark Cyberpunk Background */
+.app-bg {
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.08), transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(244, 114, 182, 0.08), transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.04), transparent 60%),
+    #020617;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Floating Neon Motes */
+.mote {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float-mote 20s infinite linear;
+  opacity: 0.3;
+}
+
+@keyframes float-mote {
+  from { transform: translateY(0) translateX(0); }
+  to { transform: translateY(-100vh) translateX(10vw); }
+}
+
+/* Cyber Scanline */
+.scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(34, 211, 238, 0.1);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
+  animation: scan 8s infinite linear;
+  pointer-events: none;
+  z-index: 50;
+}
+
+@keyframes scan {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100vh); }
+}
+
+/* Flickering Neon Pulse */
+.neon-pulse {
+  animation: pulse-flicker 4s infinite alternate ease-in-out;
+}
+
+@keyframes pulse-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+  20%, 22%, 24%, 55% {
+    opacity: 0.5;
+    filter: drop-shadow(0 0 2px currentColor);
+  }
+}
+
+/* Glassy Card Container */
+.card-container {
+  @apply bg-slate-900/50 backdrop-blur-xl border border-slate-800/60 rounded-[2.5rem] p-10
+         transition-all duration-700 hover:border-slate-600/50 hover:bg-slate-900/70
+         hover:shadow-[0_0_60px_-15px_rgba(34,211,238,0.15)];
+}
+
+/* Cyberpunk Inputs with Glow on Focus */
+.form-input {
+  @apply w-full px-6 py-4 bg-slate-950/70 border border-slate-800 rounded-2xl 
+         focus:ring-2 focus:ring-cyan-500/10 focus:border-cyan-500/50 outline-none 
+         transition-all duration-500 placeholder:text-slate-700 text-slate-100 text-sm;
+}
+
+.form-label {
+  @apply text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mb-3 block ml-2;
+}
+
+/* Realistic A4 Paper Effect */
+.cv-container {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 20mm;
+  margin: 0 auto;
+  background: #ffffff;
+  box-shadow: 
+    0 30px 70px -15px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  color: #0f172a;
+  font-family: var(--font-sans), sans-serif;
+  position: relative;
+}
+
+@media print {
+  body { background: white !important; margin: 0 !important; }
+  .no-print { display: none !important; }
+  .cv-container {
+    width: 210mm !important;
+    height: 297mm !important;
+    padding: 20mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    page-break-after: always;
+  }
+  @page { size: A4; margin: 0; }
+}
+
+/* Advanced Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar { width: 3px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { 
+  background: linear-gradient(to bottom, #1e293b, #334155, #1e293b); 
+  border-radius: 20px; 
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* Section Hover Animation: Pulse Dot */
+.section-dot {
+  @apply w-1.5 h-1.5 rounded-full mr-2 opacity-50 transition-all duration-500;
+}
+.group:hover .section-dot {
+  @apply opacity-100 scale-150 shadow-[0_0_8px_currentColor];
+}
+
+/* Glitch Effect Primitives */
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+.glitch-hover:hover {
+  animation: glitch 0.3s infinite;
 }
