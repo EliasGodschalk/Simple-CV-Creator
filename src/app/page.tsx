@@ -166,13 +166,12 @@ function DesignerCore({ loading, motes }: { loading: boolean; motes: any[] }) {
           
           <div className="flex gap-4">
              <motion.button
-              whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(6,182,212,0.4)" }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ boxShadow: "0 0 30px rgba(6,182,212,0.4)" }}
               onClick={() => handlePrint()}
-              className="group flex items-center gap-4 px-14 py-5 bg-white text-slate-950 rounded-[2rem] transition-all shadow-3xl hover:bg-cyan-400 active:scale-95 font-black text-sm tracking-widest uppercase relative overflow-hidden glitch-hover"
+              className="group flex items-center gap-4 px-14 py-5 bg-white text-slate-950 rounded-[2rem] transition-all shadow-3xl hover:bg-cyan-400 font-black text-sm tracking-widest uppercase relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-              <Download size={22} strokeWidth={3} className="group-hover:-translate-y-1 transition-transform" />
+              <Download size={22} strokeWidth={3} />
               Export Identity
             </motion.button>
           </div>

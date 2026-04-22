@@ -127,41 +127,7 @@ export const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
             </section>
           )}
 
-          {/* Projects */}
-          {(projects.length > 0 || !hasPersonalDetails) && (
-             <section>
-               <h2 className="text-xs font-black text-slate-900 uppercase tracking-[0.3em] mb-8 flex items-center gap-4">
-                 <span className="flex-shrink-0">Repositories</span>
-                 <span className="flex-grow h-px bg-slate-100" />
-               </h2>
-               <div className="grid grid-cols-1 gap-8">
-                 {projects.length > 0 ? (
-                   projects.map((proj) => (
-                     <div key={proj.id} className="relative pl-6 border-l-2 border-slate-100">
-                        <div className="absolute -left-[7px] top-0 w-3 h-3 rounded-full border-2 border-white" style={{ backgroundColor: accentColor }} />
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-black text-slate-900 text-base leading-none uppercase tracking-tight">{proj.title || 'Repository Title'}</h3>
-                          <div className="flex gap-4">
-                            {proj.githubUrl && <a href={proj.githubUrl} className="text-slate-400 hover:text-slate-900 transition-colors"><GitBranch size={14} /></a>}
-                            {proj.link && <a href={proj.link} className="text-slate-400 hover:text-slate-900 transition-colors"><Globe size={14} /></a>}
-                          </div>
-                        </div>
-                        <p className="text-[13px] text-slate-600 leading-relaxed font-medium mb-4">{proj.description}</p>
-                        <div className="flex flex-wrap gap-2">
-                          {proj.techStack.split(',').map((tech, idx) => tech.trim() && (
-                            <span key={idx} className="px-2 py-0.5 bg-slate-50 text-slate-500 rounded text-[9px] font-black uppercase tracking-widest border border-slate-100">
-                              {tech.trim()}
-                            </span>
-                          ))}
-                        </div>
-                     </div>
-                   ))
-                 ) : (
-                   <div className="text-[11px] font-medium uppercase tracking-widest opacity-40">No active repositories.</div>
-                 )}
-               </div>
-             </section>
-          )}
+
         </div>
 
         {/* Sidebar */}
@@ -267,12 +233,7 @@ export const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
         </div>
       </div>
 
-      {/* Modern Watermark */}
-      <div className="absolute bottom-12 right-20 opacity-10">
-        <div className="text-[40px] font-black text-slate-900 uppercase tracking-[0.5em] origin-right transform -rotate-90 pointer-events-none select-none">
-          QUALIFIED
-        </div>
-      </div>
+
     </div>
   );
 });
