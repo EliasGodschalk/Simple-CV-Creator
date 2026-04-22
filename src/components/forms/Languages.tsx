@@ -58,6 +58,22 @@ export function LanguagesForm() {
                 />
               </div>
 
+              <div className="space-y-4">
+                <div className="flex justify-between items-end">
+                  <label className="form-label">Proficiency Level</label>
+                  <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">{lang.level}/5</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  step="1"
+                  value={lang.level}
+                  onChange={(e) => updateLanguage(lang.id, { level: parseInt(e.target.value) })}
+                  className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-cyan-500 border border-slate-800"
+                />
+              </div>
+
               <div className="space-y-2">
                 <label className="form-label">CEFR / Level Label</label>
                 <div className="flex flex-wrap gap-2">

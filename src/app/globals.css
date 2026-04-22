@@ -35,74 +35,51 @@ body {
   overflow: hidden;
 }
 
-/* Floating Neon Motes */
-.mote {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: white;
-  border-radius: 50%;
+/* Ambient Film Grain Overlay */
+.film-grain {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.05;
   pointer-events: none;
-  animation: float-mote 20s infinite linear;
-  opacity: 0.3;
+  z-index: 99;
+  mix-blend-mode: soft-light;
+  animation: noise 0.2s infinite;
 }
 
-@keyframes float-mote {
-  from { transform: translateY(0) translateX(0); }
-  to { transform: translateY(-100vh) translateX(10vw); }
+@keyframes noise {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-1%, -1%); }
+  20% { transform: translate(1%, 1%); }
+  30% { transform: translate(-2%, 0); }
+  40% { transform: translate(2%, 2%); }
+  50% { transform: translate(-1%, -2%); }
+  60% { transform: translate(1%, 2%); }
+  70% { transform: translate(-2%, 1%); }
+  80% { transform: translate(2%, -1%); }
+  90% { transform: translate(-1%, 1%); }
+  100% { transform: translate(1%, -1%); }
 }
 
-/* Cyber Scanline */
-.scanline {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: rgba(34, 211, 238, 0.1);
-  box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
-  animation: scan 8s infinite linear;
-  pointer-events: none;
-  z-index: 50;
-}
-
-@keyframes scan {
-  from { transform: translateY(-100%); }
-  to { transform: translateY(100vh); }
-}
-
-/* Flickering Neon Pulse */
-.neon-pulse {
-  animation: pulse-flicker 4s infinite alternate ease-in-out;
-}
-
-@keyframes pulse-flicker {
-  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-    opacity: 1;
-    filter: drop-shadow(0 0 8px currentColor);
-  }
-  20%, 22%, 24%, 55% {
-    opacity: 0.5;
-    filter: drop-shadow(0 0 2px currentColor);
-  }
-}
-
-/* Glassy Card Container */
-.card-container {
-  @apply bg-slate-900/50 backdrop-blur-xl border border-slate-800/60 rounded-[2.5rem] p-10
-         transition-all duration-700 hover:border-slate-600/50 hover:bg-slate-900/70
-         hover:shadow-[0_0_60px_-15px_rgba(34,211,238,0.15)];
-}
-
-/* Cyberpunk Inputs with Glow on Focus */
+/* Cyberpunk Inputs with Magnetic Focus Effect */
 .form-input {
   @apply w-full px-6 py-4 bg-slate-950/40 border border-slate-800 rounded-2xl 
          focus:ring-2 focus:ring-cyan-500/10 focus:border-cyan-500/50 focus:bg-slate-950/80 outline-none 
          transition-all duration-500 placeholder:text-slate-700 text-slate-100 text-sm;
+  box-shadow: 0 0 0 0 rgba(34, 211, 238, 0);
+  font-variant-numeric: tabular-nums;
+}
+
+.form-input:focus {
+  box-shadow: 0 0 40px -10px rgba(34, 211, 238, 0.15);
 }
 
 .form-label {
   @apply text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-3 block ml-2;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Realistic A4 Paper Effect */

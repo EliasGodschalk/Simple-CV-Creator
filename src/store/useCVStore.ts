@@ -64,7 +64,7 @@ export interface Certification {
   link: string;
 }
 
-export interface CVState {
+export interface CVData {
   personalDetails: PersonalDetails;
   summary: string;
   experiences: Experience[];
@@ -75,12 +75,25 @@ export interface CVState {
   certifications: Certification[];
   settings: {
     accentColor: string;
+    layout: string;
   };
+}
+
+export interface SavedCV {
+  id: string;
+  name: string;
+  date: string;
+  data: CVData;
+}
+
+export interface CVState extends CVData {
+  savedCVs: SavedCV[];
   
   // Actions
   updatePersonalDetails: (details: Partial<PersonalDetails>) => void;
   updateSummary: (summary: string) => void;
   updateSettings: (settings: Partial<CVState['settings']>) => void;
+  setLayout: (layout: string) => void;
   
   addExperience: () => void;
   updateExperience: (id: string, experience: Partial<Experience>) => void;
@@ -105,6 +118,14 @@ export interface CVState {
   addCertification: () => void;
   updateCertification: (id: string, certification: Partial<Certification>) => void;
   removeCertification: (id: string) => void;
+
+  // History Actions
+  saveCurrentToHistory: (name: string) => void;
+  loadFromHistory: (id: string) => void;
+  deleteFromHistory: (id: string) => void;
+  clearCurrent: () => void;
+  loadPreset: (data: CVData) => void;
+  setFullState: (state: Partial<CVState>) => void;
 }
 
 const initialPersonalDetails: PersonalDetails = {
@@ -118,24 +139,35 @@ const initialPersonalDetails: PersonalDetails = {
   photo: '',
 };
 
+const emptyCVData: CVData = {
+  personalDetails: initialPersonalDetails,
+  summary: '',
+  experiences: [],
+  education: [],
+  skills: [],
+  projects: [],
+  languages: [],
+  certifications: [],
+  settings: {
+    accentColor: '#2563eb',
+    layout: 'modern',
+  },
+};
+
 export const useCVStore = create<CVState>()(
   persist(
-    (set) => ({
-      personalDetails: initialPersonalDetails,
-      summary: '',
-      experiences: [],
-      education: [],
-      skills: [],
-      projects: [],
-      languages: [],
-      certifications: [],
-      settings: {
-        accentColor: '#2563eb', // Default Electric Blue
-      },
+    (set, get) => ({
+      ...emptyCVData,
+      savedCVs: [],
 
       updateSettings: (newSettings) =>
         set((state) => ({
           settings: { ...state.settings, ...newSettings },
+        })),
+
+      setLayout: (layout) =>
+        set((state) => ({
+          settings: { ...state.settings, layout },
         })),
 
       updatePersonalDetails: (details) =>
@@ -291,6 +323,47 @@ export const useCVStore = create<CVState>()(
         set((state) => ({
           certifications: state.certifications.filter((cert) => cert.id !== id),
         })),
+
+      saveCurrentToHistory: (name) => {
+        const state = get();
+        const newSavedCV: SavedCV = {
+          id: generateId(),
+          name: name || `CV_${new Date().toLocaleDateString()}`,
+          date: new Date().toLocaleString(),
+          data: {
+            personalDetails: state.personalDetails,
+            summary: state.summary,
+            experiences: state.experiences,
+            education: state.education,
+            skills: state.skills,
+            projects: state.projects,
+            languages: state.languages,
+            certifications: state.certifications,
+            settings: state.settings,
+          },
+        };
+        set((state) => ({
+          savedCVs: [newSavedCV, ...state.savedCVs],
+        }));
+      },
+
+      loadFromHistory: (id) => {
+        const savedCV = get().savedCVs.find((cv) => cv.id === id);
+        if (savedCV) {
+          set({ ...savedCV.data });
+        }
+      },
+
+      deleteFromHistory: (id) =>
+        set((state) => ({
+          savedCVs: state.savedCVs.filter((cv) => cv.id !== id),
+        })),
+
+      clearCurrent: () => set({ ...emptyCVData }),
+
+      loadPreset: (data) => set({ ...data }),
+
+      setFullState: (newState) => set((state) => ({ ...state, ...newState })),
     }),
     {
       name: 'cv-storage',

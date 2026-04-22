@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id               String            @id // Clerk User ID
+  summary          String?           @db.Text
+  skills           String[]
+  accentColor      String            @default("#2563eb")
+  personalDetails  PersonalDetails?
+  experiences      Experience[]
+  education        Education[]
+  projects         Project[]
+  languages        Language[]
+  certifications   Certification[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model PersonalDetails {
+  id        String @id @default(cuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName  String
+  jobTitle  String
+  email     String
+  phone     String
+  location  String
+  linkedin  String
+  portfolio String
+  photo     String? @db.Text
+}
+
+model Experience {
+  id          String  @id @default(cuid())
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company     String
+  position    String
+  location    String
+  startDate   String
+  endDate     String
+  current     Boolean @default(false)
+  description String  @db.Text
+}
+
+model Education {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institution String
+  degree      String
+  location    String
+  startDate   String
+  endDate     String
+  description String @db.Text
+}
+
+model Project {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String @db.Text
+  techStack   String
+  link        String
+  githubUrl   String
+}
+
+model Language {
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name     String
+  level    Int
+  protocol String
+}
+
+model Certification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name   String
+  issuer String
+  date   String
+  link   String
+}
