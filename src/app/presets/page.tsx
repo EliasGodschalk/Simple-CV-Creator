@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Layout, Cpu, Palette, Zap, CheckCircle2 } from 'lucide-react';
+import { Layout, Cpu, Palette, Zap, CheckCircle2, Eye } from 'lucide-react';
 import { useCVStore, CVData } from '@/store/useCVStore';
 import { useRouter } from 'next/navigation';
-import { CyberText } from '@/components/CyberText';
+import { CVPreview } from '@/components/cv/CVPreview';
 
 const presets = [
   {
@@ -85,6 +85,7 @@ const presets = [
 export default function PresetsPage() {
   const { loadPreset } = useCVStore();
   const router = useRouter();
+  const [hoveredPreset, setHoveredPreset] = useState<string | null>(null);
 
   const handleLoad = (data: CVData) => {
     loadPreset(data);
@@ -98,63 +99,86 @@ export default function PresetsPage() {
       <div className="max-w-6xl mx-auto space-y-16 py-12">
         <header className="space-y-6">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3 px-5 py-2.5 bg-purple-500/5 text-purple-400 w-fit rounded-full text-[11px] font-black uppercase tracking-[0.5em] border border-purple-500/20"
+            className="flex items-center gap-2 px-4 py-2 bg-slate-900 border border-slate-800 text-slate-400 w-fit rounded-full text-[10px] font-bold uppercase tracking-widest"
           >
-            <Layout size={14} />
-            Template Directory
+            <Layout size={12} />
+            Template Gallery
           </motion.div>
           <div className="space-y-4">
-            <h1 className="text-6xl font-black text-white tracking-tighter uppercase italic leading-none">
-              <CyberText text="Choose" className="block mb-2" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-500">
-                A Template.
+            <h1 className="text-5xl font-black text-white tracking-tighter uppercase leading-none">
+              Choose Your <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+                Professional Foundation.
               </span>
             </h1>
-            <p className="text-slate-500 text-sm font-medium tracking-widest max-w-lg leading-relaxed border-l-2 border-slate-800 pl-6 uppercase">
-              Select a pre-configured layout to jumpstart your professional CV.
+            <p className="text-slate-500 text-sm font-medium tracking-wide max-w-lg leading-relaxed">
+              Select a pre-configured layout to jumpstart your professional CV. 
+              Each preset is optimized for specific industries and roles.
             </p>
           </div>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {presets.map((preset, i) => (
             <motion.div
               key={preset.id}
-              initial={{ opacity: 0, scale: 0.9, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ y: -10 }}
-              className="group relative"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              onMouseEnter={() => setHoveredPreset(preset.id)}
+              onMouseLeave={() => setHoveredPreset(null)}
+              className="group relative flex flex-col bg-slate-900/40 border border-slate-800/50 rounded-3xl overflow-hidden transition-all duration-500 hover:border-slate-700 hover:bg-slate-900/60"
             >
-              <div 
-                className="h-full bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-[2.5rem] p-8 space-y-8 flex flex-col transition-all duration-500 group-hover:border-slate-700/80 group-hover:bg-slate-900/60"
-                style={{ boxShadow: `0 0 40px -20px ${preset.accent}20` }}
-              >
+              {/* Preview Area */}
+              <div className="aspect-[16/10] relative bg-slate-950 flex items-center justify-center overflow-hidden border-b border-slate-800/50">
                 <div 
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500"
-                  style={{ backgroundColor: `${preset.accent}10`, color: preset.accent, border: `1px solid ${preset.accent}30` }}
-                >
-                  <preset.icon size={28} />
+                  className="absolute inset-0 opacity-20 pointer-events-none" 
+                  style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '24px 24px' }} 
+                />
+                
+                {/* Scaled Preview */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[794px] h-[1123px] origin-center scale-[0.22] transition-transform duration-700 group-hover:scale-[0.24] rounded-lg overflow-hidden bg-white shadow-2xl">
+                   <CVPreview data={preset.data as any} />
                 </div>
 
-                <div className="space-y-4 flex-1">
-                  <h3 className="text-xl font-black text-white uppercase tracking-tight">{preset.name}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed font-medium">{preset.description}</p>
-                </div>
-
-                <button 
+                {/* Clickable Overlay Area */}
+                <div 
                   onClick={() => handleLoad(preset.data as CVData)}
-                  className="w-full py-4 rounded-2xl bg-white text-slate-950 font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-500 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 relative overflow-hidden group/btn"
-                >
-                  <div 
-                    className="absolute inset-0 translate-x-full group-hover/btn:translate-x-0 transition-transform duration-700 opacity-10"
-                    style={{ backgroundColor: preset.accent }}
-                  />
-                  Use Template
-                  <Zap size={14} className="group-hover/btn:animate-pulse" />
-                </button>
+                  className="absolute inset-0 cursor-pointer z-10 group-hover:bg-slate-950/20 transition-colors"
+                />
+              </div>
+
+              {/* Info Area */}
+              <div className="p-8 space-y-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500"
+                      style={{ backgroundColor: `${preset.accent}10`, color: preset.accent, border: `1px solid ${preset.accent}20` }}
+                    >
+                      <preset.icon size={22} />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white tracking-tight">{preset.name}</h3>
+                      <p className="text-slate-500 text-xs font-medium mt-1">{preset.description}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => handleLoad(preset.data as CVData)}
+                    className="flex-1 py-3 px-6 rounded-xl bg-white text-slate-950 font-black text-[11px] uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                  >
+                    Use This Template
+                    <Zap size={14} className="fill-current" />
+                  </button>
+                  <div className="p-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-slate-500">
+                    <Eye size={18} />
+                  </div>
+                </div>
               </div>
             </motion.div>
           ))}
@@ -162,9 +186,9 @@ export default function PresetsPage() {
 
         <footer className="pt-24 text-center">
           <div className="inline-flex items-center gap-4 px-8 py-4 bg-slate-900/30 border border-slate-800/50 rounded-2xl">
-            <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
-              Your saved CVs are available in <span className="text-white">History</span>.
+            <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              Select a template to begin customizing your identity.
             </span>
           </div>
         </footer>

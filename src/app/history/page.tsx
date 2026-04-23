@@ -1,19 +1,32 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Database, Trash2, ExternalLink, Calendar, User, Briefcase, Clock } from 'lucide-react';
 import { useCVStore } from '@/store/useCVStore';
 import { useRouter } from 'next/navigation';
 import { CyberText } from '@/components/CyberText';
+import { ConfirmationModal } from '@/components/ConfirmationModal';
 
 export default function HistoryPage() {
   const { savedCVs, loadFromHistory, deleteFromHistory } = useCVStore();
   const router = useRouter();
+  const [cvToDelete, setCvToDelete] = useState<string | null>(null);
 
   const handleLoad = (id: string) => {
     loadFromHistory(id);
     router.push('/new');
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setCvToDelete(id);
+  };
+
+  const confirmDelete = () => {
+    if (cvToDelete) {
+      deleteFromHistory(cvToDelete);
+      setCvToDelete(null);
+    }
   };
 
   return (
@@ -74,7 +87,7 @@ export default function HistoryPage() {
                         </div>
                       </div>
                       <button 
-                        onClick={() => deleteFromHistory(cv.id)}
+                        onClick={() => handleDeleteClick(cv.id)}
                         className="p-2 text-slate-600 hover:text-red-400 transition-colors"
                       >
                         <Trash2 size={16} />
@@ -126,6 +139,16 @@ export default function HistoryPage() {
           </motion.div>
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={!!cvToDelete}
+        onClose={() => setCvToDelete(null)}
+        onConfirm={confirmDelete}
+        title="Delete CV Record?"
+        message="This operation is irreversible. The saved CV data will be permanently removed from your history protocol."
+        confirmText="Confirm Deletion"
+        variant="danger"
+      />
     </div>
   );
 }

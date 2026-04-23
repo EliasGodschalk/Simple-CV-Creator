@@ -4,42 +4,15 @@ import React from 'react';
 import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/nextjs";
 
 /**
- * StatusOrb
- * A dynamic status indicator that reflects the cloud synchronization state.
- */
-const StatusOrb: React.FC = () => {
-  // In a real scenario, we'd check if a sync is currently in progress.
-  // For now, we'll simulate the "Synced" vs "Saving" based on if the user is signed in.
-  const { isSignedIn, isLoaded } = useAuth();
-  
-  if (!isLoaded || !isSignedIn) return null;
-
-  return (
-    <div className="flex items-center gap-3 px-4 py-2 bg-slate-900/40 backdrop-blur-md border border-slate-800/50 rounded-full transition-all group hover:border-cyan-500/30">
-      <div className="relative flex items-center justify-center">
-        <div className="w-2 h-2 bg-cyan-500 rounded-full shadow-[0_0_10px_rgba(6,182,212,0.5)]" />
-        <div className="absolute inset-0 w-2 h-2 bg-cyan-400 rounded-full animate-ping opacity-20" />
-      </div>
-      <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] group-hover:text-cyan-400 transition-colors">
-        Cloud Sync Active
-      </span>
-    </div>
-  );
-};
-
-/**
  * Header
  * The top navigation and authentication control center.
+ * Now simplified to only handle Auth and Identity.
  */
 export const Header: React.FC = () => {
   const { isLoaded, isSignedIn } = useAuth();
 
   return (
-    <header className="flex justify-between items-center no-print">
-      <div className="flex items-center gap-4">
-        <StatusOrb />
-      </div>
-
+    <header className="flex justify-end items-center no-print w-full mb-12">
       <div className="flex items-center gap-6">
         {isLoaded && !isSignedIn && (
           <div className="flex items-center gap-6">

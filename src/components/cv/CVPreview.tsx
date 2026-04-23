@@ -30,8 +30,10 @@ export const CVPreview = forwardRef<HTMLDivElement, CVPreviewProps>(({ data: pro
   };
 
   return (
-    <div ref={ref} className="cv-container bg-white shadow-2xl">
-      {renderLayout()}
+    <div ref={ref} className="cv-container bg-white shadow-2xl min-h-[1122px]">
+      <div className="relative z-10">
+        {renderLayout()}
+      </div>
     </div>
   );
 });
@@ -60,7 +62,7 @@ const ModernLayout = ({ data }: { data: any }) => {
   const accentColor = settings?.accentColor || "#2563eb";
 
   return (
-    <div className="p-8">
+    <div className="p-10">
       <header className="mb-12">
         <div className="flex justify-between items-start border-l-[12px] pl-8" style={{ borderColor: accentColor }}>
           <div className="flex flex-col gap-6">

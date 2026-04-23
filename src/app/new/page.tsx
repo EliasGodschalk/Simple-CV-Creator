@@ -2,8 +2,8 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { useReactToPrint } from 'react-to-print';
-import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
-import { Cpu, ExternalLink } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ExternalLink, Cpu } from 'lucide-react';
 
 import { useCVSync } from '@/hooks/useCVSync';
 import { BackgroundFX } from '@/components/layout/BackgroundFX';
@@ -19,7 +19,6 @@ import { SkillsForm } from '@/components/forms/Skills';
 import { ProjectsForm } from '@/components/forms/Projects';
 import { LanguagesForm } from '@/components/forms/Languages';
 import { CertificationsForm } from '@/components/forms/Certifications';
-import { ThemeSettings } from '@/components/forms/ThemeSettings';
 
 import { staggeredContainer, staggeredItem } from '@/lib/animations';
 
@@ -30,12 +29,6 @@ function DesignerCore({ loading }: { loading: boolean }) {
   // Sync with cloud
   useCVSync();
   
-  const { scrollYProgress } = useScroll({ 
-    container: scrollContainerRef 
-  });
-  
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
-
   const handlePrint = useReactToPrint({
     contentRef: contentRef,
     documentTitle: 'System_Identity_Matrix',
@@ -56,31 +49,25 @@ function DesignerCore({ loading }: { loading: boolean }) {
     <main className="min-h-screen app-bg flex flex-col md:flex-row h-screen overflow-hidden text-slate-50 relative">
       <BackgroundFX />
 
-      {/* Progress Bar */}
-      <motion.div 
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 origin-left z-50 no-print"
-        style={{ scaleX }}
-      />
-
       {/* Left Panel: Designer Console */}
       <div 
         ref={scrollContainerRef}
-        className="w-full md:w-[45%] h-full overflow-y-auto custom-scrollbar no-print border-r border-slate-800/50 z-10 relative bg-slate-950/20 backdrop-blur-[2px]"
+        className="w-full md:w-1/2 h-full overflow-y-auto custom-scrollbar no-print border-r border-slate-800/50 z-10 relative bg-slate-950/20 backdrop-blur-[2px]"
       >
         <motion.div 
           variants={staggeredContainer}
           initial="hidden"
           animate={!loading ? "show" : "hidden"}
-          className="max-w-xl mx-auto px-8 py-24 space-y-20 pb-48"
+          className="max-w-4xl mx-auto px-8 py-24 space-y-20 pb-48"
         >
           <Header />
 
           <header className="space-y-8 pt-8">
              <div className="space-y-6">
-                <motion.h1 variants={staggeredItem} className="text-7xl font-black text-white tracking-tighter leading-none italic uppercase">
+                <motion.h1 variants={staggeredItem} className="text-7xl font-black text-white tracking-tighter leading-[0.85] italic uppercase">
                   <CyberText text="Create" className="block mb-4" />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">
-                    Your Profile.
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 pr-6">
+                    <span className="pr-2">Your</span> Profile.
                   </span>
                 </motion.h1>
                 <motion.p variants={staggeredItem} className="text-slate-500 text-[11px] font-black tracking-[0.4em] uppercase max-w-sm leading-relaxed border-l-2 border-slate-800/50 pl-6">
@@ -125,11 +112,13 @@ function DesignerCore({ loading }: { loading: boolean }) {
       </div>
 
       {/* Right Panel: Immersion Preview */}
-      <PreviewContainer 
-        contentRef={contentRef} 
-        handlePrint={handlePrint} 
-        loading={loading} 
-      />
+      <div className="w-full md:w-1/2 h-full relative overflow-hidden">
+        <PreviewContainer 
+          contentRef={contentRef} 
+          handlePrint={handlePrint} 
+          loading={loading} 
+        />
+      </div>
     </main>
   );
 }

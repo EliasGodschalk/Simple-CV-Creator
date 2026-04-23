@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Download, Save } from 'lucide-react';
-import { useCVStore } from '@/store/useCVStore';
 import { CVPreview } from './CVPreview';
-import { buttonPress } from '@/lib/animations';
+import { ActionToolbar } from '../layout/ActionToolbar';
 
 interface PreviewContainerProps {
   contentRef: React.RefObject<HTMLDivElement | null>;
@@ -16,13 +14,16 @@ interface PreviewContainerProps {
 /**
  * PreviewContainer
  * Features a high-fidelity 3D parallax preview of the CV document.
+ * Now includes dynamic scaling to ensure the entire CV is always visible.
  */
 export const PreviewContainer: React.FC<PreviewContainerProps> = ({ 
   contentRef, 
-  handlePrint, 
+  handlePrint,
   loading 
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   // Mouse tracking for 3D parallax
   const x = useMotionValue(0);
@@ -35,6 +36,61 @@ export const PreviewContainer: React.FC<PreviewContainerProps> = ({
   // Map mouse position to rotation
   const rotateX = useTransform(mouseY, [-300, 300], [5, -5]);
   const rotateY = useTransform(mouseX, [-300, 300], [-5, 5]);
+
+  // Dynamic Scaling Logic
+  useEffect(() => {
+    const updateScale = () => {
+      if (!containerRef.current || !contentRef.current) return;
+
+      const containerWidth = containerRef.current.clientWidth;
+      const containerHeight = containerRef.current.clientHeight;
+
+      // Padding and offsets to keep the CV within view
+      const horizontalPadding = 64; // px
+      const verticalPadding = 240; // px (accounts for toolbar, margins, and bottom padding)
+
+      const availableWidth = Math.max(containerWidth - horizontalPadding, 100);
+      const availableHeight = Math.max(containerHeight - verticalPadding, 100);
+
+      // Get the natural dimensions of the CV (unscaled)
+      // Note: we use a temporary reset of the scale if we needed to measure accurately,
+      // but offsetWidth/Height on the ref should give us the unscaled size if the 
+      // transform is applied to a wrapper.
+      const cvWidth = contentRef.current.offsetWidth;
+      const cvHeight = contentRef.current.offsetHeight;
+
+      if (cvWidth === 0 || cvHeight === 0) return;
+
+      const scaleW = availableWidth / cvWidth;
+      const scaleH = availableHeight / cvHeight;
+
+      // We want to fit the entire CV, so we take the minimum of width and height scales
+      // We also cap the scale at 1.0 to avoid over-scaling on very large screens
+      const newScale = Math.min(scaleW, scaleH, 1);
+      
+      setScale(newScale);
+      setDimensions({
+        width: cvWidth * newScale,
+        height: cvHeight * newScale
+      });
+    };
+
+    // Initial calculation
+    updateScale();
+
+    // Observe changes in both container and content
+    const resizeObserver = new ResizeObserver(updateScale);
+    
+    if (containerRef.current) resizeObserver.observe(containerRef.current);
+    if (contentRef.current) resizeObserver.observe(contentRef.current);
+
+    window.addEventListener('resize', updateScale);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateScale);
+    };
+  }, [contentRef, loading]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -55,7 +111,7 @@ export const PreviewContainer: React.FC<PreviewContainerProps> = ({
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="w-full md:w-[55%] h-full bg-[#020617] flex flex-col items-center overflow-y-auto custom-scrollbar p-12 relative"
+      className="w-full h-full bg-[#020617] flex flex-col items-center overflow-y-auto overflow-x-hidden custom-scrollbar p-8 md:p-12 relative"
     >
       {/* Structural Grid Background */}
       <div 
@@ -65,56 +121,39 @@ export const PreviewContainer: React.FC<PreviewContainerProps> = ({
           backgroundSize: '80px 80px' 
         }} 
       />
+
+      {/* Action Toolbar - Positioned above the preview */}
+      <div className="z-50 mb-8 md:mb-12 flex justify-center w-full">
+        <ActionToolbar handlePrint={handlePrint} />
+      </div>
       
-      {/* Control Actions */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={!loading ? { opacity: 1, y: 0 } : { opacity: 0 }}
-        transition={{ delay: 1, duration: 0.8 }}
-        className="w-full max-w-[210mm] flex justify-end items-center mb-20 no-print z-20"
-      >
-        <div className="flex gap-3">
-          <motion.button
-            {...buttonPress}
-            onClick={() => {
-              const name = prompt('Enter a name for this identity snapshot:', `CV_${new Date().toLocaleDateString()}`);
-              if (name) useCVStore.getState().saveCurrentToHistory(name);
-            }}
-            className="group flex items-center gap-2.5 px-5 py-2.5 bg-slate-900/60 backdrop-blur-md text-slate-400 border border-slate-800/80 rounded-xl transition-all hover:text-white hover:border-purple-500/40 font-black text-[9px] tracking-[0.2em] uppercase"
-          >
-            <Save size={14} className="text-purple-400/70 group-hover:text-purple-400 transition-colors" />
-            Save Snapshot
-          </motion.button>
-
-          <motion.button
-            {...buttonPress}
-            onClick={handlePrint}
-            className="group flex items-center gap-2.5 px-6 py-2.5 bg-white text-slate-950 rounded-xl transition-all font-black text-[9px] tracking-[0.2em] uppercase shadow-xl shadow-cyan-500/10 hover:bg-cyan-400"
-          >
-            <Download size={14} />
-            Export PDF
-          </motion.button>
-        </div>
-      </motion.div>
-
       {/* 3D Parallax Document Preview */}
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 40 }}
         animate={!loading ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0 }}
         transition={{ delay: 1.2, duration: 1, ease: [0.16, 1, 0.3, 1] }}
         style={{ rotateX, rotateY, perspective: 1000 }}
-        className="w-full flex justify-center pb-40 z-10"
+        className="w-full flex justify-center pb-20 z-10"
       >
-        <motion.div 
-          className="relative transition-shadow duration-500"
-          style={{
-            boxShadow: '0 40px 100px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)'
+        <div 
+          style={{ 
+            width: dimensions.width, 
+            height: dimensions.height,
+            transition: 'width 0.3s ease-out, height 0.3s ease-out'
           }}
+          className="relative flex justify-center"
         >
-          <div className="scale-[0.5] sm:scale-[0.6] md:scale-[0.7] lg:scale-[0.8] xl:scale-90 2xl:scale-100 origin-top">
+          <motion.div 
+            className="relative transition-shadow duration-500 origin-top"
+            style={{
+              boxShadow: '0 40px 100px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)',
+              transform: `scale(${scale})`,
+              transition: 'transform 0.3s ease-out'
+            }}
+          >
             <CVPreview ref={contentRef} />
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </motion.div>
     </div>
   );

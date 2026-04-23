@@ -8,19 +8,19 @@ export const springTransition = {
   stiffness: 100,
   damping: 15,
   restDelta: 0.001
-};
+} as const;
 
 export const slowSpring = {
   type: "spring",
   stiffness: 50,
   damping: 20
-};
+} as const;
 
 export const microSpring = {
   type: "spring",
   stiffness: 300,
   damping: 30
-};
+} as const;
 
 export const standardEase = {
   duration: 0.4,

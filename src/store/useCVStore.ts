@@ -88,6 +88,8 @@ export interface SavedCV {
 
 export interface CVState extends CVData {
   savedCVs: SavedCV[];
+  activeCVId: string | null;
+  lastSavedData: CVData | null;
   
   // Actions
   updatePersonalDetails: (details: Partial<PersonalDetails>) => void;
@@ -120,7 +122,7 @@ export interface CVState extends CVData {
   removeCertification: (id: string) => void;
 
   // History Actions
-  saveCurrentToHistory: (name: string) => void;
+  saveCurrentToHistory: (name?: string) => void;
   loadFromHistory: (id: string) => void;
   deleteFromHistory: (id: string) => void;
   clearCurrent: () => void;
@@ -139,7 +141,7 @@ const initialPersonalDetails: PersonalDetails = {
   photo: '',
 };
 
-const emptyCVData: CVData = {
+export const emptyCVData: CVData = {
   personalDetails: initialPersonalDetails,
   summary: '',
   experiences: [],
@@ -159,6 +161,8 @@ export const useCVStore = create<CVState>()(
     (set, get) => ({
       ...emptyCVData,
       savedCVs: [],
+      activeCVId: null,
+      lastSavedData: null,
 
       updateSettings: (newSettings) =>
         set((state) => ({
@@ -326,42 +330,67 @@ export const useCVStore = create<CVState>()(
 
       saveCurrentToHistory: (name) => {
         const state = get();
-        const newSavedCV: SavedCV = {
-          id: generateId(),
-          name: name || `CV_${new Date().toLocaleDateString()}`,
-          date: new Date().toLocaleString(),
-          data: {
-            personalDetails: state.personalDetails,
-            summary: state.summary,
-            experiences: state.experiences,
-            education: state.education,
-            skills: state.skills,
-            projects: state.projects,
-            languages: state.languages,
-            certifications: state.certifications,
-            settings: state.settings,
-          },
+        const currentData: CVData = {
+          personalDetails: state.personalDetails,
+          summary: state.summary,
+          experiences: state.experiences,
+          education: state.education,
+          skills: state.skills,
+          projects: state.projects,
+          languages: state.languages,
+          certifications: state.certifications,
+          settings: state.settings,
         };
-        set((state) => ({
-          savedCVs: [newSavedCV, ...state.savedCVs],
-        }));
+
+        if (state.activeCVId) {
+          // Update existing
+          set((state) => ({
+            savedCVs: state.savedCVs.map((cv) =>
+              cv.id === state.activeCVId
+                ? {
+                    ...cv,
+                    name: name || cv.name,
+                    date: new Date().toLocaleString(),
+                    data: currentData,
+                  }
+                : cv
+            ),
+            lastSavedData: currentData,
+          }));
+        } else {
+          // Create new
+          const newId = generateId();
+          const newSavedCV: SavedCV = {
+            id: newId,
+            name: name || `CV_${new Date().toLocaleDateString()}`,
+            date: new Date().toLocaleString(),
+            data: currentData,
+          };
+          set((state) => ({
+            savedCVs: [newSavedCV, ...state.savedCVs],
+            activeCVId: newId,
+            lastSavedData: currentData,
+          }));
+        }
       },
 
       loadFromHistory: (id) => {
         const savedCV = get().savedCVs.find((cv) => cv.id === id);
         if (savedCV) {
-          set({ ...savedCV.data });
+          set({ ...savedCV.data, activeCVId: id, lastSavedData: savedCV.data });
         }
       },
 
       deleteFromHistory: (id) =>
         set((state) => ({
           savedCVs: state.savedCVs.filter((cv) => cv.id !== id),
+          activeCVId: state.activeCVId === id ? null : state.activeCVId,
+          lastSavedData: state.activeCVId === id ? null : state.lastSavedData,
         })),
 
-      clearCurrent: () => set({ ...emptyCVData }),
+      clearCurrent: () => set({ ...emptyCVData, activeCVId: null, lastSavedData: null }),
 
-      loadPreset: (data) => set({ ...data }),
+      loadPreset: (data) => set({ ...data, activeCVId: null, lastSavedData: null }),
 
       setFullState: (newState) => set((state) => ({ ...state, ...newState })),
     }),

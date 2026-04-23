@@ -31,11 +31,19 @@ export async function saveCVData(userId: string, rawData: unknown) {
     });
 
     if (data.personalDetails) {
+      const pd = {
+        ...data.personalDetails,
+        phone: data.personalDetails.phone || "",
+        location: data.personalDetails.location || "",
+        linkedin: data.personalDetails.linkedin || "",
+        portfolio: data.personalDetails.portfolio || "",
+        photo: data.personalDetails.photo || null,
+      };
       await prisma.personalDetails.upsert({
         where: { userId },
-        update: data.personalDetails,
+        update: pd,
         create: {
-          ...data.personalDetails,
+          ...pd,
           userId,
         },
       });
@@ -43,61 +51,89 @@ export async function saveCVData(userId: string, rawData: unknown) {
 
     if (data.experiences) {
       await prisma.$transaction(
-        data.experiences.map((exp) =>
-          prisma.experience.upsert({
+        data.experiences.map((exp) => {
+          const mappedExp = {
+            ...exp,
+            location: exp.location || "",
+            endDate: exp.endDate || "",
+            description: exp.description || "",
+          };
+          return prisma.experience.upsert({
             where: { id: exp.id },
-            update: { ...exp, userId },
-            create: { ...exp, userId },
-          })
-        )
+            update: { ...mappedExp, userId },
+            create: { ...mappedExp, userId },
+          });
+        })
       );
     }
 
     if (data.education) {
       await prisma.$transaction(
-        data.education.map((edu) =>
-          prisma.education.upsert({
+        data.education.map((edu) => {
+          const mappedEdu = {
+            ...edu,
+            location: edu.location || "",
+            endDate: edu.endDate || "",
+            description: edu.description || "",
+          };
+          return prisma.education.upsert({
             where: { id: edu.id },
-            update: { ...edu, userId },
-            create: { ...edu, userId },
-          })
-        )
+            update: { ...mappedEdu, userId },
+            create: { ...mappedEdu, userId },
+          });
+        })
       );
     }
 
     if (data.projects) {
       await prisma.$transaction(
-        data.projects.map((proj) =>
-          prisma.project.upsert({
+        data.projects.map((proj) => {
+          const mappedProj = {
+            ...proj,
+            description: proj.description || "",
+            techStack: proj.techStack || "",
+            link: proj.link || "",
+            githubUrl: proj.githubUrl || "",
+          };
+          return prisma.project.upsert({
             where: { id: proj.id },
-            update: { ...proj, userId },
-            create: { ...proj, userId },
-          })
-        )
+            update: { ...mappedProj, userId },
+            create: { ...mappedProj, userId },
+          });
+        })
       );
     }
 
     if (data.languages) {
       await prisma.$transaction(
-        data.languages.map((lang) =>
-          prisma.language.upsert({
+        data.languages.map((lang) => {
+          const mappedLang = {
+            ...lang,
+            protocol: lang.protocol || "",
+          };
+          return prisma.language.upsert({
             where: { id: lang.id },
-            update: { ...lang, userId },
-            create: { ...lang, userId },
-          })
-        )
+            update: { ...mappedLang, userId },
+            create: { ...mappedLang, userId },
+          });
+        })
       );
     }
 
     if (data.certifications) {
       await prisma.$transaction(
-        data.certifications.map((cert) =>
-          prisma.certification.upsert({
+        data.certifications.map((cert) => {
+          const mappedCert = {
+            ...cert,
+            date: cert.date || "",
+            link: cert.link || "",
+          };
+          return prisma.certification.upsert({
             where: { id: cert.id },
-            update: { ...cert, userId },
-            create: { ...cert, userId },
-          })
-        )
+            update: { ...mappedCert, userId },
+            create: { ...mappedCert, userId },
+          });
+        })
       );
     }
 

@@ -4,11 +4,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PlusCircle, Database, LayoutTemplate, Cpu, Terminal, ChevronRight } from 'lucide-react';
+import { PlusCircle, Database, LayoutTemplate, Cpu, Terminal, ChevronRight, LogIn, UserPlus } from 'lucide-react';
+import { useAuth, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { cn } from '@/lib/utils';
+import { CyberLogo } from './CyberLogo';
 
 const navItems = [
-  { name: 'New CV', href: '/new', icon: PlusCircle, color: 'text-cyan-400', glow: 'shadow-cyan-500/20' },
+  { name: 'Editor Console', href: '/new', icon: Terminal, color: 'text-cyan-400', glow: 'shadow-cyan-500/20' },
   { name: 'Presets', href: '/presets', icon: LayoutTemplate, color: 'text-purple-400', glow: 'shadow-purple-500/20' },
   { name: 'History', href: '/history', icon: Database, color: 'text-blue-400', glow: 'shadow-blue-500/20' },
 ];
@@ -16,6 +18,7 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
+  const { isLoaded, isSignedIn } = useAuth();
 
   return (
     <div 
@@ -39,8 +42,8 @@ export function Sidebar() {
         )}>
           {/* Logo Area */}
           <div className="p-8 flex items-center gap-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.3)] shrink-0">
-              <PlusCircle size={20} className="text-white" />
+            <div className="w-12 h-12 shrink-0">
+              <CyberLogo className="w-full h-full drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]" />
             </div>
             <div>
               <h1 className="text-sm font-black text-white tracking-[0.2em] uppercase italic leading-tight">
@@ -50,7 +53,7 @@ export function Sidebar() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-8 space-y-4">
+          <nav className="flex-1 px-4 py-4 space-y-4">
             {navItems.map((item) => {
               const isActive = pathname === item.href || (item.href === '/new' && pathname === '/');
               
@@ -101,6 +104,48 @@ export function Sidebar() {
               );
             })}
           </nav>
+
+          {/* Auth Section */}
+          <div className="px-4 py-4 border-t border-slate-800/30">
+            {!isLoaded ? (
+              <div className="h-12 w-full bg-slate-900/20 animate-pulse rounded-xl" />
+            ) : !isSignedIn ? (
+              <div className="flex flex-col gap-2">
+                <SignInButton mode="modal">
+                  <button className="flex items-center gap-3 px-4 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20 transition-all text-[10px] font-black uppercase tracking-[0.2em] w-full text-left cursor-pointer">
+                    <LogIn size={18} />
+                    Login
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button className="flex items-center gap-3 px-4 py-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20 transition-all text-[10px] font-black uppercase tracking-[0.2em] w-full text-left cursor-pointer">
+                    <UserPlus size={18} />
+                    Sign Up
+                  </button>
+                </SignUpButton>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between px-4 py-3 bg-slate-900/40 border border-slate-800/50 rounded-2xl shadow-lg">
+                <div className="flex items-center gap-3 min-w-0">
+                  <UserButton 
+                    appearance={{
+                      elements: {
+                        userButtonAvatarBox: "w-8 h-8 rounded-lg border border-cyan-500/30",
+                        userButtonPopoverCard: "bg-slate-950 border border-slate-800 shadow-[0_0_50px_rgba(0,0,0,1)]",
+                        userButtonPopoverActionButton: "hover:bg-slate-900 text-slate-300",
+                        userButtonPopoverActionButtonText: "text-[11px] font-black uppercase tracking-widest",
+                        userButtonPopoverFooter: "hidden"
+                      }
+                    }}
+                  />
+                  <div className="flex flex-col min-w-0 overflow-hidden">
+                    <span className="text-[10px] font-black text-white uppercase tracking-wider truncate">Account</span>
+                    <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest truncate">Authorized</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Footer Info */}
           <div className="p-6">
